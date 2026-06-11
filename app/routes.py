@@ -384,16 +384,22 @@ def cek_id():
     if hasil.get('data', {}).get('status') in ['Sukses', 'Pending']:
         sn = hasil.get('data', {}).get('sn', '')
         pesan = hasil.get('data', {}).get('message', '')
-        nickname_ditemukan = sn if sn else pesan
         
+        # --- KODE BARU: Memanipulasi pesan jika statusnya Pending ---
+        if not sn and hasil.get('data', {}).get('status') == 'Pending':
+            nickname_ditemukan = "ID Valid & Terdeteksi (Disembunyikan oleh sistem)"
+        else:
+            nickname_ditemukan = sn if sn else pesan
+            
         return jsonify({
             "status": "success", 
             "nickname": nickname_ditemukan
         })
     else:
+        pesan_error_asli = hasil.get('data', {}).get('message', 'Terjadi kesalahan tidak diketahui di server Digiflazz.')
         return jsonify({
             "status": "error", 
-            "message": "ID tidak ditemukan. Silakan periksa kembali!"
+            "message": f"Ditolak Digiflazz: {pesan_error_asli}"
         })
 
 @main.route('/success')
