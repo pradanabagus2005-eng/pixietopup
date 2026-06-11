@@ -161,7 +161,10 @@
         }
         @media (max-width: 860px) {
             .page-layout { grid-template-columns: 1fr; }
-            .sidebar-col { order: -1; }
+            .sidebar-col { 
+                position: relative; 
+                top: auto; 
+            }
         }
 
         /* ===== STEP CARD ===== */
@@ -533,26 +536,18 @@
         }
 
         /* ===== FOOTER ===== */
-.site-footer {
-    background: #1A1A2E;
-    color: rgba(255,255,255,0.5);
-    text-align: center;
-    padding: 30px 20px 20px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    margin-top: 40px;
-    width: 100%;
-}
-@media (max-width: 768px) {
-    #kotak-ringkasan {
-        position: relative !important;
-        top: auto !important;
-        bottom: auto !important;
-        z-index: 1; /* Agar tidak tumpang tindih */
-    }
-}
-.site-footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
-.site-footer a:hover { color: var(--primary-light); }
+        .site-footer {
+            background: #1A1A2E;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            padding: 30px 20px 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-top: 40px;
+            width: 100%;
+        }
+        .site-footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+        .site-footer a:hover { color: var(--primary-light); }
         
     </style>
 </head>
@@ -848,14 +843,12 @@
 <script>
     let selectedProductId = null;
     let selectedPaymentMethod = null;
-    let baseHargaProduk = 0; // Menyimpan harga dasar (termasuk untung +1000 jika pulsa)
+    let baseHargaProduk = 0; 
     
-    // Cek apakah halaman ini kategori game atau bukan dari Python Jinja2
     let isGameCategory = {% if is_pulsa or is_listrik %}false{% else %}true{% endif %};
     let isListrik = {% if is_listrik %}true{% else %}false{% endif %};
     let isPulsa = {% if is_pulsa %}true{% else %}false{% endif %};
 
-    // Format rupiah on load
     document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll('.format-rupiah').forEach(el => {
             let n = parseInt(el.innerText);
@@ -880,7 +873,7 @@
         document.querySelectorAll('.product-card').forEach(k => k.classList.remove('active'));
         element.classList.add('active');
         
-        updateTotalHarga(); // Kalkulasi harga saat klik produk
+        updateTotalHarga();
     }
 
     function pilihPembayaran(element, metode) {
@@ -891,7 +884,7 @@
         document.querySelectorAll('.payment-card').forEach(k => k.classList.remove('active'));
         element.classList.add('active');
         
-        updateTotalHarga(); // Kalkulasi harga saat klik metode bayar
+        updateTotalHarga();
     }
 
     function updateTotalHarga() {
@@ -899,14 +892,11 @@
         
         let finalPrice = baseHargaProduk;
         
-        // Deteksi secara otomatis apakah item yang diklik adalah paket data
         let itemName = document.getElementById('selectedItemName').innerText.toLowerCase();
         let isPaketData = ['data', 'internet', 'gb', 'hari', 'freedom', 'kuota', 'combo'].some(k => itemName.includes(k));
         
-        // Tentukan apakah produk ini wajib kena margin persentase metode pembayaran (Listrik dihapus dari sini)
         let kenaMargin = isGameCategory || (isPulsa && isPaketData);
         
-        // Tambahkan persentase keuntungan HANYA JIKA ini masuk kategori di atas dan metode bayar sudah diklik
         if (kenaMargin && selectedPaymentMethod) {
             if (selectedPaymentMethod === 'NQ') {
                 finalPrice = finalPrice + (finalPrice * 0.107);
@@ -915,19 +905,16 @@
             } else if (selectedPaymentMethod === 'SP') {
                 finalPrice = finalPrice + (finalPrice * 0.12);
             } else if (['BC', 'M2', 'BR', 'I1'].includes(selectedPaymentMethod)) {
-                // Biaya admin Virtual Account (10% + 4000)
                 finalPrice = finalPrice + (finalPrice * 0.10) + 4000;
             } else {
-                // Metode lainnya (Minimarket, dll)
                 finalPrice = finalPrice + (finalPrice * 0.10) + 2500;
             }
         }
         
-        finalPrice = Math.floor(finalPrice); // Bulatkan angka ke bawah agar rapi
+        finalPrice = Math.floor(finalPrice);
         document.getElementById('totalHarga').innerText = 'Rp ' + finalPrice.toLocaleString('id-ID');
     }
 
-    // Fungsi pembantu untuk mematikan / menghidupkan skeleton loading
     function toggleSkeleton(isActive) {
         const itemEl = document.getElementById('selectedItemName');
         const priceEl = document.getElementById('totalHarga');
@@ -948,7 +935,7 @@
             let finalTargetId = "";
             let userIdEl = document.getElementById('userId');
             let zoneIdEl = document.getElementById('zoneId');
-            let serverIdEl = document.getElementById('serverId'); // Variabel baru
+            let serverIdEl = document.getElementById('serverId'); 
             
             if (userIdEl && zoneIdEl) {
                 let uId = userIdEl.value.trim();
@@ -983,13 +970,9 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mengecek ID...';
             btn.disabled = true;
             
-            // Mengaktifkan Skeleton Loading
             toggleSkeleton(true);
 
             try {
-                // ==========================================
-                // TAHAP 1: MENGINTIP NICKNAME KE DIGIFLAZZ
-                // ==========================================
                 let gameNameStr = "{{ game_name }}";
                 let checkRes = await fetch('/api/cek-id', {
                     method: 'POST',
@@ -999,9 +982,8 @@
                 
                 let checkData = await checkRes.json();
 
-                // Jika ID Ditemukan, Munculkan Pop-up!
                 if (checkData.status === "success") {
-                    toggleSkeleton(false); // Matikan efek sejenak untuk memunculkan popup
+                    toggleSkeleton(false); 
                     
                     let konfirmasi = await Swal.fire({
                         title: 'Konfirmasi Nickname',
@@ -1013,26 +995,21 @@
                         confirmButtonColor: '#6f42c1'
                     });
 
-                    // Jika pembeli klik Batal
                     if (!konfirmasi.isConfirmed) {
                         btn.innerHTML = originalText;
                         btn.disabled = false;
-                        return; // Hentikan proses
+                        return; 
                     }
-                    toggleSkeleton(true); // Hidupkan lagi skeleton jika lanjut
+                    toggleSkeleton(true); 
                 } 
-                // Jika ID salah / tidak terdaftar
                 else if (checkData.status === "error") {
                     toggleSkeleton(false);
                     Swal.fire({ icon: 'error', title: 'ID Tidak Valid', text: checkData.message });
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    return; // Hentikan proses
+                    return; 
                 }
 
-                // ==========================================
-                // TAHAP 2: LANJUT BAYAR KE DUITKU
-                // ==========================================
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Membuat Tagihan...';
                 let response = await fetch('/api/checkout', {
                     method: 'POST',
