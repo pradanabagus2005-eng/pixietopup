@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Gunakan URL Sandbox (Testing) selama masa pengembangan
-DUITKU_API_URL = "https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry"
+DUITKU_API_URL = "https://api-prod.duitku.com/webapi/api/merchant/v2/inquiry"
 
 def create_invoice(order_id, amount, payment_method, product_details, customer_email="tester@pixietopup.my.id", customer_phone="08123456789"):
     """Mengirim request ke Duitku untuk membuat link pembayaran"""
