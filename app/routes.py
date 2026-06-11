@@ -363,15 +363,15 @@ def callback_digiflazz():
 
 @main.route('/api/cek-id', methods=['POST'])
 def cek_id():
-    import time  # Wajib ditambahkan agar sistem bisa melakukan 'delay'
+    import time
     
     data = request.json
     game_name = data.get('game_name')
     target_id = data.get('target_id')
 
     CHECKER_SKU = {
-        "MOBILE LEGENDS": "pre31831538", # Pastikan sudah diganti jika ada SKU baru
-        "FREE FIRE": "pre31831544"       # Pastikan sudah diganti jika ada SKU baru
+        "MOBILE LEGENDS": "pre31831538",
+        "FREE FIRE": "pre31831544"
     }
 
     sku_checker = CHECKER_SKU.get(game_name.upper())
@@ -381,24 +381,18 @@ def cek_id():
 
     ref_id = f"CEK-{uuid.uuid4().hex[:8].upper()}"
     
-    # 1. Kirim pertanyaan pertama ke server Digiflazz
     hasil = proses_topup(target_id, sku_checker, ref_id)
     
     status_digi = hasil.get('data', {}).get('status')
     sn = hasil.get('data', {}).get('sn', '')
     pesan = hasil.get('data', {}).get('message', '')
 
-    # =======================================================
-    # 2. SISTEM MENUNGGU (POLLING) MAKSIMAL ~10 DETIK
-    # =======================================================
     maksimal_tunggu = 4
     percobaan = 0
 
-    # Jika masih Pending dan Nickname (SN) belum ada, terus tanyakan!
     while status_digi == 'Pending' and not sn and percobaan < maksimal_tunggu:
-        time.sleep(2.5)  # Berhenti sejenak 2.5 detik
+        time.sleep(2.5)
         
-        # Tanya ulang ke Digiflazz dengan nomor ref_id yang sama persis
         hasil = proses_topup(target_id, sku_checker, ref_id) 
         
         status_digi = hasil.get('data', {}).get('status')
@@ -406,25 +400,19 @@ def cek_id():
         pesan = hasil.get('data', {}).get('message', '')
         
         percobaan += 1
-    # =======================================================
 
-   if status_digi in ['Sukses', 'Pending']:
+    if status_digi in ['Sukses', 'Pending']:
         if sn:
-            # Pecah teks berdasarkan garis miring '/' dan bersihkan spasinya
             parts = [p.strip() for p in sn.split('/')]
-            nickname_bersih = sn  # Teks bawaan jika gagal dipotong
+            nickname_bersih = sn 
             
-            # Cek satu per satu potongannya
             for part in parts:
-                # Jika ada potongan yang diawali kata "Username" (Kasus Mobile Legends)
                 if part.lower().startswith('username'):
-                    # Potong 8 huruf pertama ("Username") agar tersisa namanya saja
                     nickname_bersih = part[8:].strip()
                     break
             else:
-                # Jika tidak ada kata "Username" (Kasus Free Fire: "ID / Nama")
                 if len(parts) >= 2:
-                    nickname_bersih = parts[1]  # Ambil nama yang ada di tengah/akhir
+                    nickname_bersih = parts[1]
                     
             nickname_ditemukan = nickname_bersih
             
