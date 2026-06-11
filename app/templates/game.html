@@ -543,8 +543,17 @@
     margin-top: 40px;
     width: 100%;
 }
+@media (max-width: 768px) {
+    #kotak-ringkasan {
+        position: relative !important;
+        top: auto !important;
+        bottom: auto !important;
+        z-index: 1; /* Agar tidak tumpang tindih */
+    }
+}
 .site-footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
 .site-footer a:hover { color: var(--primary-light); }
+        
     </style>
 </head>
 <body>
