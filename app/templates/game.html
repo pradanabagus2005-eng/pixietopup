@@ -889,15 +889,22 @@
 
     function updateTotalHarga() {
         if (baseHargaProduk === 0) return;
-        
         let finalPrice = baseHargaProduk;
         
         let itemName = document.getElementById('selectedItemName').innerText.toLowerCase();
         let isPaketData = ['data', 'internet', 'gb', 'hari', 'freedom', 'kuota', 'combo'].some(k => itemName.includes(k));
-        
         let kenaMargin = isGameCategory || (isPulsa && isPaketData);
         
-        if (kenaMargin && selectedPaymentMethod) {
+        // --- PERUBAHAN LOGIKA JS UNTUK PLN ---
+        if (isListrik) {
+            // Jika metode bayar adalah Virtual Account, tambah Rp 3000
+            if (['BC', 'M2', 'BR', 'I1'].includes(selectedPaymentMethod)) {
+                finalPrice = finalPrice + 3000;
+            }
+            // QRIS dll menyusul (tetap baseHargaProduk)
+        } 
+        else if (kenaMargin && selectedPaymentMethod) {
+            // Logika untuk Game dan Paket Data
             if (selectedPaymentMethod === 'NQ') {
                 finalPrice = finalPrice + (finalPrice * 0.107);
             } else if (['OV', 'DA', 'LA'].includes(selectedPaymentMethod)) {
@@ -910,6 +917,7 @@
                 finalPrice = finalPrice + (finalPrice * 0.10) + 2500;
             }
         }
+        // -------------------------------------
         
         finalPrice = Math.floor(finalPrice);
         document.getElementById('totalHarga').innerText = 'Rp ' + finalPrice.toLocaleString('id-ID');
