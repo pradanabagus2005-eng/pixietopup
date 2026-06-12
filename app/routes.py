@@ -132,7 +132,7 @@ def sync_products():
         
         if isinstance(data_digiflazz, dict) and "message" in data_digiflazz:
             return jsonify({"status": "error", "message": f"Ditolak Digiflazz: {data_digiflazz.get('message')}"})
-          
+            
         Product.query.update({Product.is_active: False})
 
         for item in data_digiflazz:
@@ -245,10 +245,6 @@ def checkout():
             final_price = final_price + (final_price * 0.10) + 4000
         else: # Metode lain seperti minimarket
             final_price = final_price + (final_price * 0.10) + 2500
-
-    # --- TAMBAHAN BIAYA ADMIN +3000 KHUSUS PRODUK PLN VIA VIRTUAL ACCOUNT ---
-    if is_listrik and payment_method in ['BC', 'M2', 'BR', 'I1']:
-        final_price = final_price + 3000
             
     final_price = int(final_price) # Membulatkan ke angka genap terdekat
     # ==========================================
@@ -290,7 +286,7 @@ def checkout():
         })
 
 @main.route('/api/callback/duitku', methods=['POST'])
-# @verify_duitku_ip 
+#@verify_duitku_ip 
 def callback_duitku():
     data = request.form if request.form else request.json
     if not data:
@@ -328,7 +324,7 @@ def callback_duitku():
             trx.status = 'PROCESSING'
         else:
             trx.status = 'MANUAL' 
-          
+            
         db.session.commit()
         
     elif result_code == '01':
