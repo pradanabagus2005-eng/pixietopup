@@ -331,6 +331,30 @@
                     <div class="result-status-msg">SUKSES — Pesanan Berhasil!</div>
                 </div>
             </div>
+
+            {% if trx.status == 'SUCCESS' or trx.status == 'PAID' %}
+        <div class="result-status success">
+            <div class="result-status-icon"><i class="fa-solid fa-check"></i></div>
+            <div class="result-status-text">
+                <div class="result-status-label">Status Top Up</div>
+                <div class="result-status-msg">SUKSES — Pesanan Berhasil!</div>
+            </div>
+        </div>
+        
+        {% elif trx.status == 'PROCESSING' %}
+        <div class="result-status" style="background: #E0F2FE; border: 1px solid #BAE6FD;">
+            <div class="result-status-icon" style="background: #F0F9FF; color: #0284C7;"><i class="fa-solid fa-arrows-rotate fa-spin"></i></div>
+            <div class="result-status-text">
+                <div class="result-status-label" style="color: #0369A1;">Status Top Up</div>
+                <div class="result-status-msg" style="color: #0284C7;">PROCESSING — Sedang Dikirim</div>
+            </div>
+        </div>
+        {% elif trx.status == 'PENDING' %}
+        <div class="result-status pending">
+            ```
+
+Setelah kamu mengatur Webhook di *dashboard* Digiflazz dan melakukan *deploy* ulang pembaruan HTML tersebut ke Vercel, sistem *top up* kamu sudah 100% matang, serba otomatis, dan siap digunakan oleh pelanggan!
+            
             {% elif trx.status == 'PENDING' %}
             <div class="result-status pending">
                 <div class="result-status-icon"><i class="fa-solid fa-hourglass-half"></i></div>
