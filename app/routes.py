@@ -219,24 +219,35 @@ def checkout():
         if angka_list:
             nominal = max([int(x) for x in angka_list])
             if nominal >= 1000:
+                # Harga dasar PLN = Nominal aslinya + Untung Rp 2000
                 final_price = nominal + 2000
 
-    # Perbaikan Margin Listrik
-    kena_margin_persen = is_game or is_paket_data or is_listrik
-
-    if kena_margin_persen:
-        if payment_method == 'NQ':
-            final_price = final_price + (final_price * 0.107)
-        elif payment_method in ['OV', 'DA', 'LA']: 
-            final_price = final_price + (final_price * 0.1167)
-        elif payment_method == 'SP': 
-            final_price = final_price + (final_price * 0.12)
-        elif payment_method in ['BC', 'M2', 'BR', 'I1']: 
-            final_price = final_price + (final_price * 0.10) + 4000
-        else: 
-            final_price = final_price + (final_price * 0.10) + 2500
+    # ==========================================
+    # LOGIKA BIAYA ADMIN PAYMENT GATEWAY
+    # ==========================================
+    if is_listrik:
+        # Khusus PLN: Hanya tambah Rp 3.000 jika pembeli pakai Virtual Account
+        if payment_method in ['BC', 'M2', 'BR', 'I1']: 
+            final_price = final_price + 3000
+        # Untuk QRIS dll, harganya tetap tidak ditambah apa-apa (menyusul)
+        
+    else:
+        # Khusus Game & Paket Data: Tetap pakai logika persentase lama
+        kena_margin_persen = is_game or is_paket_data
+        if kena_margin_persen:
+            if payment_method == 'NQ':
+                final_price = final_price + (final_price * 0.107)
+            elif payment_method in ['OV', 'DA', 'LA']: 
+                final_price = final_price + (final_price * 0.1167)
+            elif payment_method == 'SP': 
+                final_price = final_price + (final_price * 0.12)
+            elif payment_method in ['BC', 'M2', 'BR', 'I1']: 
+                final_price = final_price + (final_price * 0.10) + 4000
+            else: 
+                final_price = final_price + (final_price * 0.10) + 2500
             
     final_price = int(final_price) 
+    # ==========================================
 
     order_id = f"PX-{uuid.uuid4().hex[:8].upper()}"
     
